@@ -51,3 +51,12 @@ class CollectionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ['title', 'description', 'uuid']
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    movies = MovieSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Collection
+        fields = ['title', 'description', 'movies', 'uuid']
+        read_only_fields = ['uuid']

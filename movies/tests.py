@@ -189,3 +189,86 @@ class CollectionListCreateViewTests(APITestCase):
 
         self.assertEqual(collection.movies.count(), 1)
         self.assertEqual(collection.movies.first().uuid, existing_movie_uuid)
+
+class CollectionRetrieveUpdateDestroyViewTests(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password', email='testuser@example.com')
+        self.user2 = User.objects.create_user(username='testuser2', password='password', email='testuser2@example.com')
+
+        self.movie1 = Movie.objects.create(
+            title="Movie 1", 
+            uuid="9a4fcb67-24f6-4cda-8f49-ad66b689f486",
+            description="Description 1", 
+            genres="Genre1"
+        )
+        self.movie2 = Movie.objects.create(
+            title="Movie 2", 
+            uuid="9a4fcb67-24f6-4cda-8f49-ad66b689f487", 
+            description="Description 2", 
+            genres="Genre2"
+        )
+        self.collection = Collection.objects.create(
+            user=self.user,
+            uuid="9a4fcb67-24f6-4cda-8f49-ad66b689f489",
+            title="Test Collection",
+            description="Test Description"
+        )
+        self.collection.movies.add(self.movie1, self.movie2)
+        self.url = reverse('collection-retrive-update-destroy', kwargs={'uuid':self.collection.uuid})
+
+    def test_retrieve_collection(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], self.collection.title)
+        self.assertEqual(len(response.data['movies']), 2)
+
+    def test_retrieve_collection_unauthenticated(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_collection(self):
+        new_data = {
+            'title': 'Updated Collection Title',
+            'description': 'Updated Description'
+        }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.put(self.url, new_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.collection.refresh_from_db()
+        self.assertEqual(self.collection.title, new_data['title'])
+        self.assertEqual(self.collection.description, new_data['description'])
+
+    def test_update_collection_unauthenticated(self):
+        new_data = {
+            'title': 'Updated Collection Title',
+            'description': 'Updated Description'
+        }
+        response = self.client.put(self.url, new_data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_partial_update_collection(self):
+        new_data = {
+            'title': 'Partially Updated Collection Title'
+        }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(self.url, new_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.collection.refresh_from_db()
+        self.assertEqual(self.collection.title, new_data['title'])
+
+    def test_delete_collection(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Collection.objects.filter(uuid=self.collection.uuid).exists())
+
+    def test_update_collection_unauthorized(self):
+        new_data = {
+            'title': 'Updated Collection Title',
+            'description': 'Updated Description'
+        }
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.put(self.url, new_data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

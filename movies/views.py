@@ -1,11 +1,14 @@
-from rest_framework.generics import ListCreateAPIView
+from django.shortcuts import get_object_or_404
+
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import CollectionCreateSerializer, CollectionListSerializer
-from .models import Collection, Movie
+from . import serializers as movie_serializers
+from .models import Collection
 from .helpers import get_favorite_genres
+
 
 class CollectionListCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -34,5 +37,21 @@ class CollectionListCreateView(ListCreateAPIView):
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return CollectionListSerializer
-        return CollectionCreateSerializer
+            return movie_serializers.CollectionListSerializer
+        return movie_serializers.CollectionCreateSerializer
+
+
+class CollectionRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = movie_serializers.CollectionSerializer
+    lookup_field = 'uuid'
+
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, uuid=self.kwargs.get(self.lookup_field))
+    
+    def get_queryset(self):
+        return Collection.objects.filter(user=self.request.user).prefetch_related('movies')
