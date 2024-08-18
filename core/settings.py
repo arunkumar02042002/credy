@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     # Local
-    'authentication'
+    'authentication',
+    'movies'
 ]
 
 MIDDLEWARE = [
