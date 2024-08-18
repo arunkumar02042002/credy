@@ -13,6 +13,7 @@ cryptography = "*"
 psycopg2 = "*"
 djangorestframework-simplejwt = "*"
 shortuuid = "*"
+requests = "*"
 
 [dev-packages]
 
