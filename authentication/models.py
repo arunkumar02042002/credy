@@ -60,7 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
-    email = models.EmailField(_("email address"), null=True, unique=True, db_index=True)
+    email = models.EmailField(_("email address"), null=True, db_index=True)
 
     is_staff = models.BooleanField(
         _("staff status"),
