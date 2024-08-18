@@ -42,7 +42,6 @@ INTERNAL_IPS = [
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,6 +52,11 @@ INSTALLED_APPS = [
 
     # Third Party
     'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',
+
+    # Local
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -100,6 +104,7 @@ DATABASES = {
     },
 }
 
+AUTH_USER_MODEL='authentication.User'
 
 
 # Password validation
