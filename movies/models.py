@@ -9,9 +9,9 @@ User = get_user_model()
 # Create your models here.
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    uuid = models.CharField(max_length=100)
-    description = models.TextField()
-    genres = models.CharField(max_length=255)
+    uuid = models.CharField(max_length=100, default=uuid.uuid4)
+    description = models.TextField(null=True, blank=True)
+    genres = models.CharField(max_length=255, null=True, blank=True)
     
     def __str__(self) -> str:
         return f'{self.title}'
@@ -19,7 +19,7 @@ class Movie(models.Model):
 
 class Collection(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='collections')
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, db_index=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
 
@@ -34,12 +34,12 @@ class Collection(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f'{str(self.user_id)}_{self.title}'
+        return f'{self.user.username}_{self.title}'
 
 
 class MovieInCollection(models.Model):
     movie = models.ForeignKey(to=Movie, on_delete=models.CASCADE, db_index=True)
-    collection = models.ForeignKey(to=Collection, on_delete=models.CASCADE, related_name='movie_collections', db_index=True)
+    collection = models.ForeignKey(to=Collection, on_delete=models.CASCADE, db_index=True)
     added_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -48,6 +48,6 @@ class MovieInCollection(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f'movie_{str(self.movie_id)}_in_collection{str(self.collection_id)}'
+        return f'movie_{self.movie.title}_in_collection_{self.collection.title}'
 
 
