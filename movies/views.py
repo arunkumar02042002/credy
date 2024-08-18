@@ -1,13 +1,14 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from . import serializers as movie_serializers
 from .models import Collection
-from .helpers import get_favorite_genres
+from .helpers import get_favorite_genres, CredyMovieUtil
 
 
 class CollectionListCreateView(ListCreateAPIView):
@@ -55,3 +56,17 @@ class CollectionRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return Collection.objects.filter(user=self.request.user).prefetch_related('movies')
+    
+
+class MovieListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        page = request.query_params.get('page', 1)
+        result, success = CredyMovieUtil.get_movies(page=page)
+        if success:
+            return Response(result)
+        
+        return Response({
+            'details':'Unable to fetch movies after many tries.'
+        }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        

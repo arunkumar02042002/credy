@@ -1,4 +1,5 @@
 import uuid
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -272,3 +273,20 @@ class CollectionRetrieveUpdateDestroyViewTests(APITestCase):
         self.client.force_authenticate(user=self.user2)
         response = self.client.put(self.url, new_data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class MovieListViewTest(APITestCase):
+    
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('movies')
+    
+    def test_get_movies_success(self):
+        page_number = 3
+        response = self.client.get(f'{self.url}?page={page_number}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['next_page_num'], page_number+1)
+        self.assertEqual(response.data['previous_page_num'], page_number-1)
+        self.assertEqual(len(response.data['results']), 10)
+    
