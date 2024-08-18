@@ -11,6 +11,7 @@ django-debug-toolbar = "*"
 python-decouple = "*"
 cryptography = "*"
 psycopg2 = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
