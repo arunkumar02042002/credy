@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, GenericAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from . import serializers as movie_serializers
-from .models import Collection
+from .models import Collection, RequestCounter
 from .helpers import get_favorite_genres, CredyMovieUtil
 
 
@@ -69,4 +69,33 @@ class MovieListView(APIView):
         return Response({
             'details':'Unable to fetch movies after many tries.'
         }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+
+class RequestCounterView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = movie_serializers.RequestCounterSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            instance = RequestCounter.objects.get(pk=1)
+        except RequestCounter.DoesNotExist:
+            return Response({'detail': 'Request counter not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class ResetCounterView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            instance = RequestCounter.objects.get(pk=1)
+        except RequestCounter.DoesNotExist:
+            return Response({'detail': 'Request counter not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        instance.count = 0
+        instance.save()
+        return Response({
+            'message':'request count reset successfully',
+        }, status=status.HTTP_200_OK)
         

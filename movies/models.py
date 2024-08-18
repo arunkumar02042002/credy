@@ -51,3 +51,9 @@ class MovieInCollection(models.Model):
         return f'movie_{self.movie.title}_in_collection_{self.collection.title}'
 
 
+class RequestCounter(models.Model):
+    count = models.DecimalField(max_digits=15, decimal_places=1)
+    upadted_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.count)
