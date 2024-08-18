@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Movie, Collection
+from .models import Movie, Collection, RequestCounter
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,3 +60,8 @@ class CollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ['title', 'description', 'movies', 'uuid']
         read_only_fields = ['uuid']
+
+class RequestCounterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestCounter
+        fields = ['count']

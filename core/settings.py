@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'django_celery_results',
 
     # Local
     'authentication',
@@ -68,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'movies.middleware.RequestCountMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -245,3 +247,8 @@ SWAGGER_SETTINGS = {
 # Credy
 CREDY_USERNAME=config('CREDY_USERNAME')
 CREDY_PASSWORD=config('CREDY_PASSWORD')
+
+# Celery
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = 'django-db'

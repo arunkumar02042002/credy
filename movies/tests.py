@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Movie, Collection, MovieInCollection
+from .models import Movie, Collection, MovieInCollection, RequestCounter
 
 User = get_user_model()
 
@@ -191,6 +191,7 @@ class CollectionListCreateViewTests(APITestCase):
         self.assertEqual(collection.movies.count(), 1)
         self.assertEqual(collection.movies.first().uuid, existing_movie_uuid)
 
+
 class CollectionRetrieveUpdateDestroyViewTests(APITestCase):
 
     def setUp(self):
@@ -289,4 +290,46 @@ class MovieListViewTest(APITestCase):
         self.assertEqual(response.data['next_page_num'], page_number+1)
         self.assertEqual(response.data['previous_page_num'], page_number-1)
         self.assertEqual(len(response.data['results']), 10)
+
+
+class RequestCounterViewTest(APITestCase):
     
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.client.force_authenticate(user=self.user)
+        
+        self.counter = RequestCounter.objects.create(id=1, count=1)
+        self.url = reverse('request-count')
+
+    def test_get_request_counter_success(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], '1.0')
+
+    def test_get_request_counter_not_found(self):
+        self.counter.delete()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['detail'], 'Request counter not found.')
+
+
+class ResetCounterViewTest(APITestCase):
+    
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.client.force_authenticate(user=self.user)
+        
+        self.counter = RequestCounter.objects.create(id=1, count=1)
+        self.url = reverse('request-count-reset')
+
+    def test_reset_request_counter_success(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.counter.refresh_from_db()
+        self.assertEqual(self.counter.count, 0)
+
+    def test_reset_request_counter_not_found(self):
+        self.counter.delete()
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['detail'], 'Request counter not found.')
