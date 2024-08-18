@@ -1,5 +1,10 @@
 # CREDY - Assignment
 
+## About request count
+I have currently implemented it using middleware and celery. However the current approach can be optimized. I was thinking of storing the request count in cache and schedule a daily task to update the request count in the database.
+
+By this appoach we can reduce the number of sql queries running. I would love to discuss the idea with you and learn more about it.
+
 ### Follow this documentation to install Redis
 <a href="https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/">https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/</a>
 
