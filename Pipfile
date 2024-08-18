@@ -8,6 +8,9 @@ django = "*"
 djangorestframework = "*"
 ipython = "*"
 django-debug-toolbar = "*"
+python-decouple = "*"
+cryptography = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
