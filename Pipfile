@@ -12,6 +12,7 @@ python-decouple = "*"
 cryptography = "*"
 psycopg2 = "*"
 djangorestframework-simplejwt = "*"
+shortuuid = "*"
 
 [dev-packages]
 
