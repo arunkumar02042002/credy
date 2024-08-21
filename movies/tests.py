@@ -1,5 +1,3 @@
-import uuid
-from unittest.mock import patch
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -304,7 +302,7 @@ class RequestCounterViewTest(APITestCase):
     def test_get_request_counter_success(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], '1.0')
+        self.assertEqual(response.data['count'], 1)
 
     def test_get_request_counter_not_found(self):
         self.counter.delete()
