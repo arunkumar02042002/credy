@@ -61,6 +61,7 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'movies', 'uuid']
         read_only_fields = ['uuid']
 
+
 class RequestCounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestCounter
