@@ -52,7 +52,7 @@ class MovieInCollection(models.Model):
 
 
 class RequestCounter(models.Model):
-    count = models.DecimalField(max_digits=15, decimal_places=1)
+    count = models.PositiveIntegerField(default=0)
     upadted_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
